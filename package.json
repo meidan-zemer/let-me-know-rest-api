@@ -1,0 +1,18 @@
+{
+  "name": "let-me-know-rest-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "dependencies": {
+    "aws-serverless-express": "^3.3.5",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "serverless": "^1.35.1"
+  },
+  "scripts": {
+    "deploy-dev": "serverless deploy -v -s dev"
+  },
+  "author": "",
+  "license": "ISC"
+}

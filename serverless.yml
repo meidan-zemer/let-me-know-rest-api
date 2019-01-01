@@ -1,0 +1,25 @@
+service: let-me-know-rest-api # NOTE: update this with your service name
+
+
+custom:
+  stage: ${opt:stage 'dev'}
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
+  region: eu-west-1
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+functions:
+  letMeKnow:
+    handler: handler.letMeKnow
+    events:
+      - http:
+          path: /{pathsuffix+}
+          method: get
+          cors: true
+          authorizer:
+            arn: arn:aws:cognito-idp:eu-west-1:481491855224:userpool/eu-west-1_CZTKNKx2s
