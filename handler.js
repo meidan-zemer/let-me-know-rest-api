@@ -3,14 +3,12 @@ const express = require('express');
 const app = express();
 const serverlessExpress = require('aws-serverless-express');
 
-app.get('/products', (req, res) => {
-  console.log("1:"+JSON.stringify(req));
+app.get('/contactPoints', (req, res) => {
   res.send([{name:"prod1", description:"desc",id:"1"}]);
 });
 
 app.get('*',(req,res)=>{
-  console.log("2:"+req.originalUrl)
-  res.send({url:req.originalUrl});
+  res.status(404).send('Not found');
 });
 
 
