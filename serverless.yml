@@ -15,7 +15,11 @@ provider:
 
 functions:
   letMeKnow:
-    handler: handler.letMeKnow
+    handler: dist/handler.letMeKnow
+    package:
+      exclude:
+        - src
+        - test
     events:
       - http:
           path: /{pathsuffix+}

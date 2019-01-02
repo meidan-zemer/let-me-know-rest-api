@@ -2,16 +2,23 @@
   "name": "let-me-know-rest-api",
   "version": "1.0.0",
   "description": "",
-  "main": "handler.js",
+  "main": "src/handler.ts",
   "dependencies": {
     "aws-serverless-express": "^3.3.5",
     "express": "^4.16.4"
   },
   "devDependencies": {
-    "serverless": "^1.35.1"
+    "@types/aws-serverless-express": "^3.3.0",
+    "@types/express": "^4.16.0",
+    "@types/node": "^10.12.18",
+    "prettier": "^1.15.3",
+    "serverless": "^1.35.1",
+    "typescript": "^3.2.2"
   },
   "scripts": {
-    "deploy-dev": "serverless deploy -v -s dev"
+    "deploy-dev": "npm run tsc && serverless deploy -v -s dev",
+    "tsc": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"src/**/*.tsx\" \"tests/**/*.ts\" \"tests/**/*.js\" \"tests/**/*.tsx\""
   },
   "author": "",
   "license": "ISC"
