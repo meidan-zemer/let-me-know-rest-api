@@ -2,7 +2,7 @@ import uuid from "uuid";
 import AWS from "aws-sdk";
 import moment from "moment";
 import { DynamoDB } from "aws-sdk";
-import { contactPoint } from "../../let-me-know-ts-definitions/definitions";
+import { contactPoint } from "let-me-know-ts-definitions";
 const dynamoDb = new AWS.DynamoDB.DocumentClient({ convertEmptyValues: true });
 
 const contactPointTableName = "ContactPoints";
@@ -10,23 +10,18 @@ const contactPointTableIndex = "cpId-index";
 
 export function getAllContactPoints(userId: string): Promise<contactPoint[]> {
   return new Promise<contactPoint[]>((resolve, reject) => {
-    const params: DynamoDB.QueryInput = {
+    const params: DynamoDB.DocumentClient.QueryInput= {
       TableName: contactPointTableName,
-      IndexName: contactPointTableIndex,
       KeyConditionExpression: "#userId = :userId",
       ExpressionAttributeNames: { "#userId": "userId" },
-      ExpressionAttributeValues: { ":userId": { S: userId } }
+      ExpressionAttributeValues: { ":userId": userId}
     };
 
     dynamoDb
       .query(params)
       .promise()
-      .then((data: DynamoDB.QueryOutput) => {
-        resolve(data.Items as contactPoint[]);
-      })
-      .catch(err => {
-        reject(err);
-      });
+      .then((data: DynamoDB.QueryOutput) =>resolve(data.Items as contactPoint[]))
+      .catch(err => reject(err));
   });
 }
 
@@ -45,22 +40,17 @@ export function putContcatPoint(
       userId: userId,
       description: description,
       createDate: now,
-      modifyData: now
+      modifyDate: now
     };
-    const params: DynamoDB.PutItemInput = {
+    const params: DynamoDB.DocumentClient.PutItemInput = {
       TableName: contactPointTableName,
-      Item: cp as any,
-      ReturnValues: "ALL_NEW"
+      Item: cp as any
     };
 
     dynamoDb
       .put(params)
       .promise()
-      .then((data: DynamoDB.PutItemOutput) => {
-        resolve(cp);
-      })
-      .catch((err: any) => {
-        reject(err);
-      });
+      .then((data: DynamoDB.PutItemOutput) => resolve(cp))
+      .catch((err: any) => reject(err));
   });
 }
