@@ -33,3 +33,9 @@ functions:
           cors: true
           authorizer:
             arn: arn:aws:cognito-idp:eu-west-1:481491855224:userpool/eu-west-1_CZTKNKx2s
+      - http:
+          path: /rest/{pathsuffix+}
+          method: post
+          cors: true
+          authorizer:
+            arn: arn:aws:cognito-idp:eu-west-1:481491855224:userpool/eu-west-1_CZTKNKx2s
