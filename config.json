@@ -1,0 +1,29 @@
+{
+  "cognito": {
+    "arn": "arn:aws:cognito-idp:eu-west-1:481491855224:userpool/eu-west-1_CZTKNKx2s"
+  },
+  "dynamoDb": {
+    "tables": {
+      "ContactPoints": 	{
+        "tableName": "ContactPoints",
+        "userId": "userId",
+        "cpId": "cpId",
+        "globalIndexName": "cpId-index"
+      },
+      "DiscussionMessages": {
+        "tableName": "DiscussionMessages",
+        "discussionId": "discussionId",
+        "createdTime": "createdTime"
+      },
+      "Discussions": {
+        "tableName": "Discussions",
+        "discussionId": "discussionId"
+      },
+      "DiscussionContext": {
+        "tableName": "DiscussionContext",
+        "contextId": "contextId",
+        "discussionId": "discussionId"
+      }
+    }
+  }
+}

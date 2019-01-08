@@ -1,17 +1,95 @@
 service: let-me-know-rest-api # NOTE: update this with your service name
 
-
 custom:
   stage: ${opt:stage,'dev'}
+  region: ${opt:region,'eu-west-1'}
+  config: ${file(./config.json)}
 
 provider:
   name: aws
   runtime: nodejs8.10
-  stage: ${opt:stage,'dev'}
-  region: eu-west-1
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  stage: ${self:custom.stage}
+  region: ${self:custom.region}
+  environment:
+    NODE_ENV: ${self:custom.stage}
+    REGION: ${self:custom.region}
+
+resources:
+  Resources:
+    ContactPoints:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.config.dynamoDb.tables.ContactPoints.tableName}-${self:custom.stage}
+        AttributeDefinitions:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.userId}
+            AttributeType: S
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.cpId}
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.userId}
+            KeyType: HASH
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.cpId}
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:custom.config.dynamoDb.tables.ContactPoints.globalIndexName}
+            KeySchema:
+              - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.cpId}
+                KeyType: HASH
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+            Projection:
+              ProjectionType: "ALL"
+    DiscussionMessages:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.tableName}-${self:custom.stage}
+        AttributeDefinitions:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.discussionId}
+            AttributeType: S
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.createdTime}
+            AttributeType: N
+        KeySchema:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.discussionId}
+            KeyType: HASH
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.createdTime}
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    Discussions:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.config.dynamoDb.tables.Discussions.tableName}-${self:custom.stage}
+        AttributeDefinitions:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.discussionId}
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.discussionId}
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    DiscussionContext:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.config.dynamoDb.tables.DiscussionContext.tableName}-${self:custom.stage}
+        AttributeDefinitions:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionContext.contextId}
+            AttributeType: S
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionContext.discussionId}
+            AttributeType: N
+        KeySchema:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionContext.contextId}
+            KeyType: HASH
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionContext.discussionId}
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
 functions:
   letMeKnow:
@@ -26,16 +104,16 @@ functions:
           method: get
           cors: true
           authorizer:
-            arn: arn:aws:cognito-idp:eu-west-1:481491855224:userpool/eu-west-1_CZTKNKx2s
+            arn: ${self:custom.config.cognito.arn}
       - http:
           path: /rest/{pathsuffix+}
           method: put
           cors: true
           authorizer:
-            arn: arn:aws:cognito-idp:eu-west-1:481491855224:userpool/eu-west-1_CZTKNKx2s
+            arn: ${self:custom.config.cognito.arn}
       - http:
           path: /rest/{pathsuffix+}
           method: post
           cors: true
           authorizer:
-            arn: arn:aws:cognito-idp:eu-west-1:481491855224:userpool/eu-west-1_CZTKNKx2s
+            arn: ${self:custom.config.cognito.arn}
