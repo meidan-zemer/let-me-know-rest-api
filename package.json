@@ -4,8 +4,10 @@
   "description": "",
   "main": "src/handler.ts",
   "dependencies": {
+    "@types/cookie-parser": "^1.4.1",
     "aws-serverless-express": "^3.3.5",
     "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
     "let-me-know-ts-definitions": "file:../let-me-know-ts-definitions",
     "moment": "^2.23.0",

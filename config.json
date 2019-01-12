@@ -17,12 +17,8 @@
       },
       "Discussions": {
         "tableName": "Discussions",
-        "discussionId": "discussionId"
-      },
-      "DiscussionContext": {
-        "tableName": "DiscussionContext",
-        "contextId": "contextId",
-        "discussionId": "discussionId"
+        "cpId": "cpId",
+        "userId": "userId"
       }
     }
   }

@@ -65,33 +65,34 @@ resources:
       Properties:
         TableName: ${self:custom.config.dynamoDb.tables.Discussions.tableName}-${self:custom.stage}
         AttributeDefinitions:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.discussionId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.cpId}
+            AttributeType: S
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.userId}
             AttributeType: S
         KeySchema:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.discussionId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.cpId}
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    DiscussionContext:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.config.dynamoDb.tables.DiscussionContext.tableName}-${self:custom.stage}
-        AttributeDefinitions:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionContext.contextId}
-            AttributeType: S
-          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionContext.discussionId}
-            AttributeType: N
-        KeySchema:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionContext.contextId}
-            KeyType: HASH
-          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionContext.discussionId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.userId}
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-
 functions:
+  letMeKnowWeb:
+    handler: dist/webHandler.letMeKnow
+    package:
+      exclude:
+        - src
+        - test
+    events:
+      - http:
+          path: /rest/discussion/{cpid}
+          method: get
+          cors: true
+      - http:
+          path: /rest/discussion/{cpid}
+          method: put
+          cors: true
   letMeKnow:
     handler: dist/handler.letMeKnow
     package:
