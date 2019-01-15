@@ -6,19 +6,33 @@
     "tables": {
       "ContactPoints": 	{
         "tableName": "ContactPoints",
-        "userId": "userId",
-        "cpId": "cpId",
-        "globalIndexName": "cpId-index"
+        "fields": {
+          "cpId": "cpId"
+        }
+      },
+      "ContactPointsUsers": {
+        "tableName": "ContactPointsUsers",
+        "fields": {
+          "userId": "userId",
+          "cpId": "cpId",
+          "role": "role"
+        }
       },
       "DiscussionMessages": {
         "tableName": "DiscussionMessages",
-        "discussionId": "discussionId",
-        "createdTime": "createdTime"
+        "fields": {
+          "discussionId": "discussionId",
+          "createdTime": "createdTime"
+        }
       },
       "Discussions": {
         "tableName": "Discussions",
-        "cpId": "cpId",
-        "userId": "userId"
+        "indexName": "cpId-connectorId",
+        "fields": {
+          "cpId": "cpId",
+          "discussionId": "discussionId",
+          "connectorId": "connectorId"
+        }
       }
     }
   }

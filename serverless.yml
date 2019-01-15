@@ -4,7 +4,6 @@ custom:
   stage: ${opt:stage,'dev'}
   region: ${opt:region,'eu-west-1'}
   config: ${file(./config.json)}
-
 provider:
   name: aws
   runtime: nodejs8.10
@@ -13,7 +12,6 @@ provider:
   environment:
     NODE_ENV: ${self:custom.stage}
     REGION: ${self:custom.region}
-
 resources:
   Resources:
     ContactPoints:
@@ -21,41 +19,44 @@ resources:
       Properties:
         TableName: ${self:custom.config.dynamoDb.tables.ContactPoints.tableName}-${self:custom.stage}
         AttributeDefinitions:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.userId}
-            AttributeType: S
-          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.cpId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.fields.cpId}
             AttributeType: S
         KeySchema:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.userId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.fields.cpId}
             KeyType: HASH
-          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.cpId}
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    ContactPointsUsers:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.config.dynamoDb.tables.ContactPointsUsers.tableName}-${self:custom.stage}
+        AttributeDefinitions:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPointsUsers.fields.cpId}
+            AttributeType: S
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPointsUsers.fields.userId}
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPointsUsers.fields.userId}
+            KeyType: HASH
+          - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPointsUsers.fields.cpId}
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          - IndexName: ${self:custom.config.dynamoDb.tables.ContactPoints.globalIndexName}
-            KeySchema:
-              - AttributeName: ${self:custom.config.dynamoDb.tables.ContactPoints.cpId}
-                KeyType: HASH
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-            Projection:
-              ProjectionType: "ALL"
     DiscussionMessages:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.tableName}-${self:custom.stage}
         AttributeDefinitions:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.discussionId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.fields.discussionId}
             AttributeType: S
-          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.createdTime}
-            AttributeType: N
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.fields.createdTime}
+            AttributeType: S
         KeySchema:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.discussionId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.fields.discussionId}
             KeyType: HASH
-          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.createdTime}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.DiscussionMessages.fields.createdTime}
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -65,34 +66,30 @@ resources:
       Properties:
         TableName: ${self:custom.config.dynamoDb.tables.Discussions.tableName}-${self:custom.stage}
         AttributeDefinitions:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.cpId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.fields.cpId}
             AttributeType: S
-          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.userId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.fields.discussionId}
+            AttributeType: S
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.fields.connectorId}
             AttributeType: S
         KeySchema:
-          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.cpId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.fields.cpId}
             KeyType: HASH
-          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.userId}
+          - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.fields.discussionId}
             KeyType: RANGE
+        LocalSecondaryIndexes:
+          - IndexName: ${self:custom.config.dynamoDb.tables.Discussions.indexName}
+            KeySchema:
+              - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.fields.cpId}
+                KeyType: HASH
+              - AttributeName: ${self:custom.config.dynamoDb.tables.Discussions.fields.connectorId}
+                KeyType: RANGE
+            Projection:
+              ProjectionType: "ALL"
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 functions:
-  letMeKnowWeb:
-    handler: dist/webHandler.letMeKnow
-    package:
-      exclude:
-        - src
-        - test
-    events:
-      - http:
-          path: /rest/discussion/{cpid}
-          method: get
-          cors: true
-      - http:
-          path: /rest/discussion/{cpid}
-          method: put
-          cors: true
   letMeKnow:
     handler: dist/handler.letMeKnow
     package:
